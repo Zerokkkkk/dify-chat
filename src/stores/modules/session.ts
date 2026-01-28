@@ -1,10 +1,9 @@
+import type { Message, Session } from '@/service/chat'
 import { defineStore } from 'pinia'
 import {
   deleteConversation,
   fetchConversations,
   fetchMessages,
-  type Message,
-  type Session,
 } from '@/service/chat'
 
 export const useSessionStore = defineStore('session', () => {

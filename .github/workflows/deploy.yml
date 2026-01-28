@@ -12,7 +12,7 @@ permissions:
 
 # 允许并发部署（避免旧任务阻塞新任务）
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
@@ -25,19 +25,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"  # 根据你的项目调整（如 18、20）
-          cache: "npm"        # 或 'yarn', 'pnpm'
+          node-version: '22' # 根据你的项目调整（如 18、20）
+          cache: npm # 或 'yarn', 'pnpm'
 
       - name: Install dependencies
-        run: npm ci  # 或 yarn install, pnpm install
+        run: npm ci # 或 yarn install, pnpm install
 
       - name: Build
-        run: npm run build  # 确保你的 package.json 有 "build" 脚本
+        run: npm run build # 确保你的 package.json 有 "build" 脚本
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist  # 👈 根据你的构建输出目录修改（如 build、public 等）
+          path: ./dist # 👈 根据你的构建输出目录修改（如 build、public 等）
 
   deploy:
     environment:

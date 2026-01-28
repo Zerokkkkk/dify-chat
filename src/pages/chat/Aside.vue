@@ -1,4 +1,5 @@
 <script setup lang="tsx">
+import type { Session } from '@/service/chat'
 import {
   Check,
   Close,
@@ -8,7 +9,7 @@ import {
 } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import { NDropdown, NEllipsis } from 'naive-ui'
-import { renameConversation, type Session } from '@/service/chat'
+import { renameConversation } from '@/service/chat'
 import { useSessionStore } from '@/stores/modules/session'
 
 const session = useSessionStore()

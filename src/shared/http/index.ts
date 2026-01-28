@@ -1,4 +1,5 @@
-import axios, { type AxiosError, type AxiosRequestConfig } from 'axios'
+import type { AxiosError, AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { useSessionStore } from '@/stores/modules/session'
 
