@@ -11,10 +11,10 @@ onMounted(async () => {
   if (!session.apiKey) {
     try {
       const { value } = await ElMessageBox.prompt(
-        '请输入用于调用 Dify Chat 的 API Key',
+        '请输入用于调用 Dify 后端服务 API 的 API Key',
         '缺少 API Key',
         {
-          inputPlaceholder: 'sk-xxx',
+          inputPlaceholder: 'app-xxx',
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           inputType: 'password',
