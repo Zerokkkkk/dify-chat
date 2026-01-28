@@ -18,6 +18,7 @@ session.updateSessions()
 
 const titleValue = ref('')
 const renameId = ref('')
+const deletingId = ref('')
 
 const handleRename = (item: Session) => {
   if (!titleValue.value) {
@@ -55,9 +56,10 @@ defineRender(() => (
           class={{
             'session-item': true,
             'active': session.sessionId === item.id || renameId.value === item.id,
+            'disabled': deletingId.value === item.id,
           }}
           onClick={() => {
-            if (renameId.value === item.id) {
+            if (deletingId.value === item.id || renameId.value === item.id) {
               return
             }
 
@@ -104,7 +106,13 @@ defineRender(() => (
                       break
 
                     case 'delete':
-                      session.deleteSession(item.id)
+                      deletingId.value = item.id
+                      session.deleteSession(item.id, true)
+                        .finally(() => {
+                          if (deletingId.value === item.id) {
+                            deletingId.value = ''
+                          }
+                        })
                       break
                   }
                 }}
@@ -186,6 +194,12 @@ defineRender(() => (
   &:hover,
   &.active {
     background: #f1f1f1;
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 
   :deep(.el-input__wrapper) {

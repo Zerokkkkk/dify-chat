@@ -20,7 +20,7 @@ export const useSessionStore = defineStore('session', () => {
     sessions.value = res.data || []
   }
 
-  const deleteSession = async (id: string) => {
+  const deleteSession = async (id: string, waitUpdate = false) => {
     if (!id) return
 
     await deleteConversation(id)
@@ -30,7 +30,12 @@ export const useSessionStore = defineStore('session', () => {
       clearMessages()
     }
 
-    updateSessions()
+    if (waitUpdate) {
+      return updateSessions()
+    }
+    else {
+      updateSessions()
+    }
   }
 
   const updateMessages = async (silent?: boolean) => {
