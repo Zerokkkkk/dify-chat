@@ -49,105 +49,107 @@ defineRender(() => (
 
     <h4 class="leading-24">历史记录</h4>
     <ul class="flex-col flex-1 overflow-y-auto">
-      <li
-        v-for={item in session.sessions}
-        key={item.id}
-        class={{
-          'session-item': true,
-          'active': session.sessionId === item.id || renameId.value === item.id,
-        }}
-        onClick={() => {
-          if (renameId.value === item.id) {
-            return
-          }
+      {session.sessions.map(item => (
+        <li
+          key={item.id}
+          class={{
+            'session-item': true,
+            'active': session.sessionId === item.id || renameId.value === item.id,
+          }}
+          onClick={() => {
+            if (renameId.value === item.id) {
+              return
+            }
 
-          session.chatAborter?.abort()
-          session.sessionId = item.id
-          session.updateMessages()
-        }}
-      >
-        <template v-if={renameId.value !== item.id}>
-          <span class="w-[calc(100%-30px)]">
-            <h4 class="mb-4 text-[#4B5563] leading-20">
-              <NEllipsis>
-                {item.name}
-              </NEllipsis>
-            </h4>
-            <p class="text-12 text-[#9CA3AF] leading-16">
-              {dayjs(item.created_at * 1000).format('YYYY-MM-DD HH:mm:ss')}
-            </p>
-          </span>
-          <span
-            onClick={(ev) => {
-              ev.stopPropagation()
-            }}
-          >
-            <NDropdown
-              trigger="click"
-              options={[
-                {
-                  label: '重命名',
-                  key: 'rename',
-                  icon: () => <ElIcon size={16}><Edit /></ElIcon>,
-                },
-                {
-                  label: '删除',
-                  key: 'delete',
-                  icon: () => <ElIcon size={16}><Delete /></ElIcon>,
-                },
-              ]}
-              onSelect={(v) => {
-                switch (v) {
-                  case 'rename':
-                    titleValue.value = item.name
-                    renameId.value = item.id
-                    break
-
-                  case 'delete':
-                    session.deleteSession(item.id)
-                    break
-                }
+            session.chatAborter?.abort()
+            session.sessionId = item.id
+            session.updateMessages()
+          }}
+        >
+          <template v-if={renameId.value !== item.id}>
+            <span class="w-[calc(100%-30px)]">
+              <h4 class="mb-4 text-[#4B5563] leading-20">
+                <NEllipsis>
+                  {item.name}
+                </NEllipsis>
+              </h4>
+              <p class="text-12 text-[#9CA3AF] leading-16">
+                {dayjs(item.created_at * 1000).format('YYYY-MM-DD HH:mm:ss')}
+              </p>
+            </span>
+            <span
+              onClick={(ev) => {
+                ev.stopPropagation()
               }}
             >
-              <ElIcon class="box-content hover:bg-[#bec0c5] p-4 rounded-3xl">
-                <MoreFilled />
+              <NDropdown
+                trigger="click"
+                options={[
+                  {
+                    label: '重命名',
+                    key: 'rename',
+                    icon: () => <ElIcon size={16}><Edit /></ElIcon>,
+                  },
+                  {
+                    label: '删除',
+                    key: 'delete',
+                    icon: () => <ElIcon size={16}><Delete /></ElIcon>,
+                  },
+                ]}
+                onSelect={(v) => {
+                  switch (v) {
+                    case 'rename':
+                      titleValue.value = item.name
+                      renameId.value = item.id
+                      break
+
+                    case 'delete':
+                      session.deleteSession(item.id)
+                      break
+                  }
+                }}
+              >
+                <ElIcon class="box-content hover:bg-[#bec0c5] p-4 rounded-3xl">
+                  <MoreFilled />
+                </ElIcon>
+              </NDropdown>
+            </span>
+          </template>
+
+          <template v-else>
+            <ElInput
+              maxlength={50}
+              v-model={titleValue.value}
+              placeholder="请输入标题"
+              // @ts-ignore
+              onKeydown_enter={() => handleRename(item)}
+            />
+            <span class="ml-10 f-c-c gap-4 hover:*:color-[var(--el-color-primary)]">
+              <ElIcon
+                size={16}
+                // @ts-ignore
+                onClick={() => handleRename(item)}
+              >
+                <Check />
               </ElIcon>
-            </NDropdown>
-          </span>
-        </template>
-
-        <template v-else>
-          <ElInput
-            maxlength={50}
-            v-model={titleValue.value}
-            placeholder="请输入标题"
-            onKeydown_enter={() => handleRename(item)}
-          />
-          <span class="ml-10 f-c-c gap-4 hover:*:color-[var(--el-color-primary)]">
-            <ElIcon
-              size={16}
-              // @ts-ignore
-              onClick={() => handleRename(item)}
-            >
-              <Check />
-            </ElIcon>
-            <ElIcon
-              size={16}
-              // @ts-ignore
-              onClick_stop={() => {
-                renameId.value = ''
-              }}
-            >
-              <Close />
-            </ElIcon>
-          </span>
-        </template>
-      </li>
-
-      <ElEmpty
-        v-if={session.sessions.length === 0}
-        class="m-auto"
-      />
+              <ElIcon
+                size={16}
+                // @ts-ignore
+                onClick_stop={() => {
+                  renameId.value = ''
+                }}
+              >
+                <Close />
+              </ElIcon>
+            </span>
+          </template>
+        </li>
+      ))}
+      {session.sessions.length === 0 && (
+        <ElEmpty
+          class="m-auto"
+        />
+      )}
     </ul>
   </aside>
 ))

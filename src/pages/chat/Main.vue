@@ -69,7 +69,7 @@ watchEffect(async () => {
 const chatListRef = ref<HTMLDivElement>()
 const ChatList = () => (
   <div
-    ref={el => chatListRef.value = el}
+    ref={el => chatListRef.value = el as HTMLDivElement}
     class="chat-list"
     onScroll={(ev) => {
       const { scrollTop, clientHeight, scrollHeight } = ev.target as HTMLDivElement
@@ -82,92 +82,93 @@ const ChatList = () => (
       }
     }}
   >
-    <li
-      v-for={(item, idx) in chatItems.value}
-      key={item.key}
-      class={{
-        'chat-item group': true,
-        'chat-item-user': item.role === 'user',
-        'chat-item-assistant': item.role === 'assistant',
-      }}
-    >
-      <div
-        class="flex gap-16"
-        style={{
-          'flex-direction': item.role === 'user' ? 'row-reverse' : 'row',
+    {chatItems.value.map((item, idx) => (
+      <li
+        key={item.key}
+        class={{
+          'chat-item group': true,
+          'chat-item-user': item.role === 'user',
+          'chat-item-assistant': item.role === 'assistant',
         }}
       >
-        <div class="chat-avatar sticky top-0">
-          <template v-if={item.role === 'assistant'}>
-            <span v-if={idx === chatItems.value.length - 1 && pending.value} class="absolute top--2 flex size-12">
-              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
-              <span class="relative inline-flex size-12 rounded-full bg-sky-500"></span>
-            </span>
-            <Assi />
-          </template>
-          <User v-else />
-        </div>
-        <MarkdownViewer
-          v-loading={item.role === 'assistant' && item.content === ''}
-          v-if={item.role === 'assistant'}
-          class="chat-content"
-          style={{
-            '--el-loading-spinner-size': '24px',
-          }}
-          content={item.content}
-        />
         <div
-          v-else
-          class="chat-content"
-        >
-          {item.content}
-        </div>
-      </div>
-
-      <div class={`group-hover:visible !*:m-0 invisible flex mt-6 ${item.role === 'user' ? 'flex-row-reverse mr-50' : 'ml-50'} hover:*:text-[var(--el-color-primary)]`}>
-        <ElButton
-          text
-          class="p-6 h-auto"
-          type="default"
-          onClick={() => {
-            const { copy, copied } = useClipboard({
-              legacy: true,
-            })
-
-            copy(item.content)
-              .then(() => {
-                copied && ElMessage.success('复制成功')
-              })
-              .catch((err) => {
-                ElMessage.error('复制失败')
-                console.error(err)
-              })
+          class="flex gap-16"
+          style={{
+            'flex-direction': item.role === 'user' ? 'row-reverse' : 'row',
           }}
         >
-          <Copy />
-        </ElButton>
+          <div class="chat-avatar sticky top-0">
+            <template v-if={item.role === 'assistant'}>
+              <span v-if={idx === chatItems.value.length - 1 && pending.value} class="absolute top--2 flex size-12">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
+                <span class="relative inline-flex size-12 rounded-full bg-sky-500"></span>
+              </span>
+              <Assi />
+            </template>
+            <User v-else />
+          </div>
+          <MarkdownViewer
+            v-loading={item.role === 'assistant' && item.content === ''}
+            v-if={item.role === 'assistant'}
+            class="chat-content"
+            style={{
+              '--el-loading-spinner-size': '24px',
+            }}
+            content={item.content}
+          />
+          <div
+            v-else
+            class="chat-content"
+          >
+            {item.content}
+          </div>
+        </div>
 
-        <ElButton
-          text
-          class="p-6 h-auto"
-          v-if={item.role === 'assistant'}
-          type={item.feedback === 'like' ? 'primary' : 'default'}
-          onClick={debounce(() => handleFeedback(item, 'like'), 500)}
-        >
-          <Like />
-        </ElButton>
+        <div class={`group-hover:visible !*:m-0 invisible flex mt-6 ${item.role === 'user' ? 'flex-row-reverse mr-50' : 'ml-50'} hover:*:text-[var(--el-color-primary)]`}>
+          <ElButton
+            text
+            class="p-6 h-auto"
+            type="default"
+            onClick={() => {
+              const { copy, copied } = useClipboard({
+                legacy: true,
+              })
 
-        <ElButton
-          text
-          class="p-6 h-auto"
-          v-if={item.role === 'assistant'}
-          type={item.feedback === 'dislike' ? 'primary' : 'default'}
-          onClick={debounce(() => handleFeedback(item, 'dislike'), 500)}
-        >
-          <Dislike />
-        </ElButton>
-      </div>
-    </li>
+              copy(item.content)
+                .then(() => {
+                  copied && ElMessage.success('复制成功')
+                })
+                .catch((err) => {
+                  ElMessage.error('复制失败')
+                  console.error(err)
+                })
+            }}
+          >
+            <Copy />
+          </ElButton>
+
+          <ElButton
+            text
+            class="p-6 h-auto"
+            v-if={item.role === 'assistant'}
+            type={item.feedback === 'like' ? 'primary' : 'default'}
+            onClick={debounce(() => handleFeedback(item, 'like'), 500)}
+          >
+            <Like />
+          </ElButton>
+
+          <ElButton
+            text
+            class="p-6 h-auto"
+            v-if={item.role === 'assistant'}
+            type={item.feedback === 'dislike' ? 'primary' : 'default'}
+            onClick={debounce(() => handleFeedback(item, 'dislike'), 500)}
+          >
+            <Dislike />
+          </ElButton>
+        </div>
+      </li>
+    ))}
   </div>
 )
 
@@ -193,18 +194,19 @@ const inputValue = ref('')
 const ChatInput = () => (
   <>
     <div class="flex gap-12 mb-10 px-60 *:w-a">
-      <ElCheckTag
-        checked
-        type="success"
-        v-for={item in suggests.value}
-        key={item}
-        onChange={() => {
-          inputValue.value = item
-          handleSend()
-        }}
-      >
-        {item}
-      </ElCheckTag>
+      {suggests.value.map(item => (
+        <ElCheckTag
+          checked
+          type="success"
+          key={item}
+          onChange={() => {
+            inputValue.value = item
+            handleSend()
+          }}
+        >
+          {item}
+        </ElCheckTag>
+      ))}
     </div>
 
     <div class="chat-input">
@@ -231,6 +233,7 @@ const ChatInput = () => (
           maxRows: 5,
         }}
         v-model={inputValue.value}
+        // @ts-ignore
         onKeydown_enter={(ev: any) => {
           if (pending.value) return
 
