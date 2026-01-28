@@ -279,6 +279,11 @@ const ChatInput = () => (
 const handleSend = async () => {
   if (!inputValue.value) return
 
+  if (!session.apiKey) {
+    ElMessage.warning('请先设置 API Key')
+    return
+  }
+
   suggests.value = []
 
   pending.value = true
@@ -323,7 +328,7 @@ const handleSend = async () => {
       `${import.meta.env.VITE_CHAT_BASE}/chat-messages`,
       {
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_CHAT_API_KEY}`,
+          'Authorization': `Bearer ${session.apiKey}`,
           'Content-Type': 'application/json',
         },
         method: 'POST',

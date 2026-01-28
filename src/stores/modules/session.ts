@@ -8,6 +8,7 @@ import {
 
 export const useSessionStore = defineStore('session', () => {
   const user = ref('admin')
+  const apiKey = ref(import.meta.env.VITE_CHAT_API_KEY || '')
   const sessions = ref<Session[]>([])
   const sessionId = ref('')
   const sessionLoading = ref(false)
@@ -16,6 +17,8 @@ export const useSessionStore = defineStore('session', () => {
   const chatAborter = ref()
 
   const updateSessions = async () => {
+    if (!apiKey.value) return
+
     const res = await fetchConversations()
     sessions.value = res.data || []
   }
@@ -39,6 +42,8 @@ export const useSessionStore = defineStore('session', () => {
   }
 
   const updateMessages = async (silent?: boolean) => {
+    if (!apiKey.value) return
+
     if (!silent) {
       sessionLoading.value = true
     }
@@ -62,8 +67,13 @@ export const useSessionStore = defineStore('session', () => {
     messages.value = []
   }
 
+  const setApiKey = (key: string) => {
+    apiKey.value = key
+  }
+
   return {
     user,
+    apiKey,
     /** 当前会话 ID */
     sessionId,
     /** 会话消息加载中 */
@@ -76,5 +86,6 @@ export const useSessionStore = defineStore('session', () => {
     clearMessages,
     chatAborter,
     enableSuggestions,
+    setApiKey,
   }
 })

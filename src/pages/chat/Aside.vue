@@ -14,8 +14,6 @@ import { useSessionStore } from '@/stores/modules/session'
 
 const session = useSessionStore()
 
-session.updateSessions()
-
 const titleValue = ref('')
 const renameId = ref('')
 const deletingId = ref('')

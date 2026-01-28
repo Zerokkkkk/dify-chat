@@ -16,10 +16,13 @@ export const http = axios.create({
 http.interceptors.request.use(
   (config) => {
     if (config.url?.startsWith('/chat')) {
-      config.headers.set(
-        'Authorization',
-        `Bearer ${import.meta.env.VITE_CHAT_API_KEY}`,
-      )
+      const sessionStore = useSessionStore()
+      if (sessionStore.apiKey) {
+        config.headers.set(
+          'Authorization',
+          `Bearer ${sessionStore.apiKey}`,
+        )
+      }
 
       const method = config.method?.toLocaleUpperCase()
       const user = useSessionStore().user
